@@ -30,3 +30,16 @@ pub fn show_post(pool: web::Data<models::Pool>) -> Vec<models::Post>{
     }
     posts_vec
 } 
+use models::{Post, NewPost};
+pub fn create_post(pool: web::Data<models::Pool>, new_post: web::Json<NewPost>) -> Post {
+    use schema::posts;
+    let connection = pool.get().unwrap();
+    let new_data = NewPost{
+        title: new_post.title,
+        body: new_post.body,
+    };
+    diesel::insert_into(posts::table)
+        .values(&new_data)
+        .get_result(&*connection)
+        .expect("Error saving new post")
+}

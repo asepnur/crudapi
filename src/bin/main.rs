@@ -31,7 +31,15 @@ fn main() -> std::io::Result<()> {
         App::new()
             .data(pool.clone())
             .wrap(middleware::Logger::default())
-            .service(web::resource("/").route(web::post().to(show_post)))
+            .service(
+                web::resource("/post")
+                    .route(web::get()
+                    .to(show_post)))
+            .service(
+                web::resource("/post")
+                    .data(web::JsonConfig::default().limit(1024))
+                    .route(web::post().to_async(create_post)),
+            )
     })
     .bind("127.0.0.1:8080")?
     .run()
@@ -43,4 +51,13 @@ fn show_post(
 ) -> HttpResponse {
     let result = posts::show_post(pool);
     HttpResponse::Ok().json(result) // <- send response
+}
+
+fn create_post(
+    data: web::Json<posts::models::NewPost>,
+    // pool: web::Data<posts::models::Pool>,
+    req: HttpRequest,
+) -> HttpResponse {
+    // let result = posts::create_post(pool, data);
+    HttpResponse::Ok().json(data.0)
 }
