@@ -10,6 +10,7 @@ pub struct Post {
 }
 
 use super::schema::posts;
+
 #[derive(Insertable, Debug, Serialize, Deserialize)]
 #[table_name="posts"]
 pub struct NewPost<'a>{
@@ -18,3 +19,9 @@ pub struct NewPost<'a>{
 }
 // type alias to use in multiple places
 pub type Pool = r2d2::Pool<ConnectionManager<PgConnection>>;
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct NewPostPayload{
+    pub title: String,
+    pub body: String,
+}
